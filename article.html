@@ -23,8 +23,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script>if (localStorage.getItem('site-theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
     <script>
-        if (window.location.hostname === 'afminfo.github.io' && /\/article\.html$/i.test(window.location.pathname)) {
-            window.location.replace('/net/article' + window.location.search + window.location.hash);
+        const articlePath = window.location.pathname;
+        const cleanArticlePath = articlePath.replace(/article\.html$/i, 'article');
+        if (cleanArticlePath !== articlePath) {
+            window.location.replace(cleanArticlePath + window.location.search + window.location.hash);
         }
     </script>
     <style>
@@ -292,7 +294,7 @@
                 const isGithubPagesUrl = parsedUrl.hostname.toLowerCase().endsWith('.github.io');
                 const isProjectPath = /^\/net(?:\/|$)/i.test(parsedUrl.pathname);
                 if (isGithubPagesUrl && (isProjectPath || parsedUrl.searchParams.has('category'))) {
-                    const relativePath = isProjectPath ? parsedUrl.pathname.replace(/^\/net\/?/i, '') : '';
+                    const relativePath = (isProjectPath ? parsedUrl.pathname.replace(/^\/net\/?/i, '') : '').replace(/index\.html\/?$/i, '');
                     const resolvedUrl = new URL(relativePath, getSiteUrl());
                     resolvedUrl.search = parsedUrl.search;
                     resolvedUrl.hash = parsedUrl.hash;
