@@ -1,3 +1,4 @@
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=29', { updateViaCache: 'none' }).catch(() => {});
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -14,8 +15,8 @@
     <meta id="meta-twitter-image" name="twitter:image" content="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
     <meta property="og:type" content="article">
     <meta name="theme-color" content="#123456">
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
+    <link rel="icon" type="image/jpeg" href="./Alfaham-Net.jpg">
+    <link rel="apple-touch-icon" href="./Alfaham-Net.jpg">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.webmanifest">
@@ -166,10 +167,24 @@
             .share-button svg, .notification-button svg { width: 19px; height: 19px; }
         }
     </style>
+    <style>
+        .dark-mode body { background-color: #0f0f0f; color: #f1f1f1; }
+        .dark-mode .header { background: #0f0f0f; }
+        .dark-mode .categories-bar { background-color: #0f0f0f; border-color: #303030; }
+                .dark-mode .categories-bar { background-color: #ffffff; border-color: #e0e0e0; }
+            .dark-mode .categories-bar .category-link, .dark-mode .categories-bar .category-toggle { color: #f1f1f1; }
+                .dark-mode .categories-bar .category-link, .dark-mode .categories-bar .category-toggle { color: #000000; }
+            .dark-mode .categories-bar .category-link:hover { color: #ff9900; }
+        .dark-mode .container { background-color: #212121; border-color: #303030; }
+        .dark-mode .extra-images img { background-color: #212121; border-color: #3f3f3f; }
+        .dark-mode .sub-menu { background-color: #212121; border-color: #303030; }
+        .dark-mode .content { color: #f1f1f1; }
+        .dark-mode .search-area input { background-color: #212121; color: #f1f1f1; }
+    </style>
 </head>
 <body>
     <div class="header">
-        <a class="header-logo-link" href="https://afminfo.github.io/net" aria-label="الرئيسية">
+                <a class="header-logo-link" href="./" aria-label="الرئيسية">
             <img class="header-logo" src="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(2).png" alt="شعار الموقع">
         </a>
         <form class="search-area" id="search-area">
@@ -262,21 +277,48 @@
             return String(value || '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
         }
 
+        function getSiteUrl(path = '') {
+            const basePath = window.location.pathname.replace(/(?:article(?:\.html)?|index\.html)\/?$/i, '') || '/';
+            return new URL(path, `${window.location.origin}${basePath.endsWith('/') ? basePath : `${basePath}/`}`).href;
+        }
+
+        document.querySelector('.header-logo-link')?.setAttribute('href', getSiteUrl());
+
+        function resolveCategoryUrl(url, fallback) {
+            const value = String(url || '').trim();
+            if (!value) return fallback;
+            try {
+                const parsedUrl = new URL(value, window.location.href);
+                const isGithubPagesUrl = parsedUrl.hostname.toLowerCase().endsWith('.github.io');
+                const isProjectPath = /^\/net(?:\/|$)/i.test(parsedUrl.pathname);
+                if (isGithubPagesUrl && (isProjectPath || parsedUrl.searchParams.has('category'))) {
+                    const relativePath = isProjectPath ? parsedUrl.pathname.replace(/^\/net\/?/i, '') : '';
+                    const resolvedUrl = new URL(relativePath, getSiteUrl());
+                    resolvedUrl.search = parsedUrl.search;
+                    resolvedUrl.hash = parsedUrl.hash;
+                    return resolvedUrl.href;
+                }
+                return parsedUrl.href;
+            } catch (error) {
+                return value;
+            }
+        }
+
         function getArticleHref(article) {
             const customUrl = String(article.url || article.link || '').trim();
             if (customUrl) {
                 try {
                     const parsedUrl = new URL(customUrl, window.location.href);
-                    if (/\/article(?:\.html)?$/i.test(parsedUrl.pathname)) {
+                    if (/\/article(?:\.html)?\/?$/i.test(parsedUrl.pathname)) {
                         const articleKey = parsedUrl.searchParams.get('id') || article.id;
-                        return `https://afminfo.github.io/net/article?id=${encodeURIComponent(articleKey)}`;
+                        return getSiteUrl(`article?id=${encodeURIComponent(articleKey)}`);
                     }
                 } catch (error) {
                     return customUrl;
                 }
                 return customUrl;
             }
-            return customUrl || `https://afminfo.github.io/net/article?id=${encodeURIComponent(article.id)}`;
+            return customUrl || getSiteUrl(`article?id=${encodeURIComponent(article.id)}`);
         }
 
         function renderLatestTicker(snapshot) {
@@ -337,7 +379,7 @@
             get(ref(db, 'categories')).then((snapshot) => {
                 const bar = document.getElementById('categories-bar');
                 syncStickyBarHeight();
-                bar.innerHTML = '<a href="https://afminfo.github.io/net" class="category-link" data-id="home">الرئيسية</a>';
+                bar.innerHTML = `<a href="${getSiteUrl()}" class="category-link" data-id="home">الرئيسية</a>`;
                 if (!snapshot.exists()) return;
                 const roots = buildCategoryTree(snapshot.val());
                 const escapeAttribute = (value) => String(value || '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
@@ -346,7 +388,7 @@
                     const submenu = children.length
                         ? `<div class="sub-menu">${children.map(renderCategory).join('')}</div>`
                         : '';
-                    const categoryHref = escapeAttribute(category.url || `https://afminfo.github.io/net?category=${encodeURIComponent(category.id)}`);
+                    const categoryHref = escapeAttribute(resolveCategoryUrl(category.url, getSiteUrl(`?category=${encodeURIComponent(category.id)}`)));
                     return `<div class="category-item">
                         <a href="${categoryHref}" class="category-link${children.length ? ' category-parent-link' : ''}" data-id="${escapeAttribute(category.id)}">${escapeHtml(category.name)}</a>
                         ${children.length ? `<button type="button" class="category-toggle" title="فتح الأقسام الفرعية" aria-label="فتح الأقسام الفرعية لقسم ${escapeAttribute(category.name)}" aria-expanded="false">⌄</button>` : ''}
@@ -376,7 +418,7 @@
                     });
                 });
             }).catch(() => {
-                document.getElementById('categories-bar').innerHTML = '<a href="https://afminfo.github.io/net" class="category-link">الرئيسية</a>';
+                document.getElementById('categories-bar').innerHTML = `<a href="${getSiteUrl()}" class="category-link">الرئيسية</a>`;
                 syncStickyBarHeight();
             });
         }
@@ -406,7 +448,7 @@
             searchArea.addEventListener('submit', (event) => {
                 event.preventDefault();
                 const query = searchInput.value.trim();
-                window.location.href = query ? `https://afminfo.github.io/net?q=${encodeURIComponent(query)}` : 'https://afminfo.github.io/net';
+                window.location.href = getSiteUrl(query ? `?q=${encodeURIComponent(query)}` : '');
             });
         }
 
@@ -666,7 +708,7 @@
         loadCategories();
         if ('ResizeObserver' in window) new ResizeObserver(syncStickyBarHeight).observe(document.getElementById('categories-bar'));
         window.addEventListener('resize', syncStickyBarHeight);
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=28').catch(() => {});
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=30').catch(() => {});
         setupInstallPrompt();
         setupThemeToggle();
         get(ref(db, 'articles')).then(renderLatestTicker).catch(() => renderLatestTicker({ exists: () => false }));

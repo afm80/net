@@ -1,3 +1,4 @@
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=29', { updateViaCache: 'none' }).catch(() => {});
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -5,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الفحام نت</title>
     <meta name="theme-color" content="#123456">
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
+    <link rel="icon" type="image/jpeg" href="./Alfaham-Net.jpg">
+    <link rel="apple-touch-icon" href="./Alfaham-Net.jpg">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.webmanifest">
@@ -157,10 +158,26 @@
             .subcategory-cards { grid-template-columns: 1fr; }
         }
     </style>
+    <style>
+        .dark-mode body { background-color: #0f0f0f; color: #f1f1f1; }
+        .dark-mode .header { background: #0f0f0f; }
+        .dark-mode .categories-bar { background-color: #0f0f0f; border-color: #303030; }
+                .dark-mode .categories-bar { background-color: #ffffff; border-color: #e0e0e0; }
+            .dark-mode .categories-bar .category-link, .dark-mode .categories-bar .category-toggle { color: #f1f1f1; }
+                .dark-mode .categories-bar .category-link, .dark-mode .categories-bar .category-toggle { color: #000000; }
+            .dark-mode .categories-bar .category-link:hover { color: #ff9900; }
+        .dark-mode .article-card, .dark-mode .subcategory-card, .dark-mode .empty-state, .dark-mode .main-story, .dark-mode .main-story h2, .dark-mode .footer { background-color: #212121; color: #f1f1f1; border-color: #303030; }
+        .dark-mode .subcategory-card:hover { background-color: #2a2a2a; }
+        .dark-mode .sub-menu { background-color: #212121; border-color: #303030; }
+        .dark-mode .article-info h3, .dark-mode .empty-state, .dark-mode .pagination a { color: #f1f1f1; }
+        .dark-mode .article-info p { color: #aaa; }
+        .dark-mode .pagination a { background-color: #212121; border-color: #3f3f3f; }
+        .dark-mode .search-area input { background-color: #212121; color: #f1f1f1; }
+    </style>
 </head>
 <body>
     <div class="header">
-        <a class="header-logo-link" href="https://afminfo.github.io/net" aria-label="الرئيسية">
+                <a class="header-logo-link" href="./" aria-label="الرئيسية">
             <img class="header-logo" src="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(2).png" alt="شعار الموقع">
         </a>
         <form class="search-area" id="search-area">
@@ -310,6 +327,33 @@
             return String(value || '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
         }
 
+        function getSiteUrl(path = '') {
+            const basePath = window.location.pathname.replace(/(?:article(?:\.html)?|index\.html)\/?$/i, '') || '/';
+            return new URL(path, `${window.location.origin}${basePath.endsWith('/') ? basePath : `${basePath}/`}`).href;
+        }
+
+        document.querySelector('.header-logo-link')?.setAttribute('href', getSiteUrl());
+
+        function resolveCategoryUrl(url, fallback) {
+            const value = String(url || '').trim();
+            if (!value) return fallback;
+            try {
+                const parsedUrl = new URL(value, window.location.href);
+                const isGithubPagesUrl = parsedUrl.hostname.toLowerCase().endsWith('.github.io');
+                const isProjectPath = /^\/net(?:\/|$)/i.test(parsedUrl.pathname);
+                if (isGithubPagesUrl && (isProjectPath || parsedUrl.searchParams.has('category'))) {
+                    const relativePath = isProjectPath ? parsedUrl.pathname.replace(/^\/net\/?/i, '') : '';
+                    const resolvedUrl = new URL(relativePath, getSiteUrl());
+                    resolvedUrl.search = parsedUrl.search;
+                    resolvedUrl.hash = parsedUrl.hash;
+                    return resolvedUrl.href;
+                }
+                return parsedUrl.href;
+            } catch (error) {
+                return value;
+            }
+        }
+
         function getArticlePreview(content, maxLength = 110) {
             const previewElement = document.createElement('div');
             previewElement.innerHTML = String(content || '');
@@ -445,16 +489,16 @@
             if (customUrl) {
                 try {
                     const parsedUrl = new URL(customUrl, window.location.href);
-                    if (/\/article(?:\.html)?$/i.test(parsedUrl.pathname)) {
+                    if (/\/article(?:\.html)?\/?$/i.test(parsedUrl.pathname)) {
                         const articleKey = parsedUrl.searchParams.get('id') || article.id;
-                        return `https://afminfo.github.io/net/article?id=${encodeURIComponent(articleKey)}`;
+                        return getSiteUrl(`article?id=${encodeURIComponent(articleKey)}`);
                     }
                 } catch (error) {
                     return customUrl;
                 }
                 return customUrl;
             }
-            return customUrl || `https://afminfo.github.io/net/article?id=${encodeURIComponent(article.id)}`;
+            return customUrl || getSiteUrl(`article?id=${encodeURIComponent(article.id)}`);
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -534,10 +578,10 @@
                     const bar = document.getElementById('categories-bar');
                     syncStickyBarHeight();
                     const roots = buildCategoryTree(categories);
-                    bar.innerHTML = '<a href="https://afminfo.github.io/net" class="category-link" data-id="home">الرئيسية</a>';
+                    bar.innerHTML = `<a href="${getSiteUrl()}" class="category-link" data-id="home">الرئيسية</a>`;
                     const renderCategory = (category) => {
                         const children = category.children || [];
-                        const categoryHref = category.url || `https://afminfo.github.io/net?category=${encodeURIComponent(category.id)}`;
+                        const categoryHref = resolveCategoryUrl(category.url, getSiteUrl(`?category=${encodeURIComponent(category.id)}`));
                         const submenu = children.length
                             ? `<div class="sub-menu">${children.map(renderCategory).join('')}</div>`
                             : '';
@@ -571,7 +615,7 @@
                     });
                 })
                 .catch(() => {
-                    document.getElementById('categories-bar').innerHTML = '<a href="https://afminfo.github.io/net" class="category-link" data-id="home">الرئيسية</a>';
+                    document.getElementById('categories-bar').innerHTML = `<a href="${getSiteUrl()}" class="category-link" data-id="home">الرئيسية</a>`;
                     syncStickyBarHeight();
                 });
         }
@@ -634,7 +678,7 @@
                 const params = new URLSearchParams();
                 if (selectedCategory !== 'home') params.set('category', selectedCategory);
                 if (query) params.set('q', query);
-                window.location.href = `https://afminfo.github.io/net${params.toString() ? '?' + params.toString() : ''}`;
+                window.location.href = getSiteUrl(params.toString() ? '?' + params.toString() : '');
             });
         }
 
@@ -654,7 +698,7 @@
                     .sort((first, second) => first.name.localeCompare(second.name, 'ar'));
                 if (childCategories.length) {
                     subcategoryCards.innerHTML = childCategories.map((category) => {
-                        const targetHref = category.url || `https://afminfo.github.io/net?category=${encodeURIComponent(category.id)}`;
+                        const targetHref = resolveCategoryUrl(category.url, getSiteUrl(`?category=${encodeURIComponent(category.id)}`));
                         return `
                             <a class="subcategory-card" href="${targetHref}">
                                 ${category.name}
@@ -738,7 +782,7 @@
                     if (searchTerm) params.set('q', searchTerm);
                     if (pageNumber > 1) params.set('page', pageNumber);
                     const activeClass = pageNumber === page ? ' active' : '';
-                    pagination.innerHTML += `<a href="https://afminfo.github.io/net?${params.toString()}" class="${activeClass.trim()}" aria-label="الصفحة ${pageNumber}">${pageNumber}</a>`;
+                    pagination.innerHTML += `<a href="${getSiteUrl(`?${params.toString()}`)}" class="${activeClass.trim()}" aria-label="الصفحة ${pageNumber}">${pageNumber}</a>`;
                 }
             }
         }
@@ -746,7 +790,7 @@
         loadCategories().then(loadArticles);
         if ('ResizeObserver' in window) new ResizeObserver(syncStickyBarHeight).observe(document.getElementById('categories-bar'));
         window.addEventListener('resize', syncStickyBarHeight);
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=28').catch(() => {});
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=30').catch(() => {});
         setupInstallPrompt();
         setupThemeToggle();
     </script>

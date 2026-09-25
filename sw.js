@@ -1,5 +1,6 @@
-const CACHE_NAME = 'iraq-net-shell-v28';
-const APP_SHELL = ['./', './index.html', './article.html', './404.html', './admin.html', './manifest.webmanifest'];
+const CACHE_PREFIX = 'iraq-net-shell-';
+const CACHE_NAME = `${CACHE_PREFIX}v30`;
+const APP_SHELL = ['./', './index.html', './article.html', './404.html', './admin.html', './manifest.webmanifest', './Alfaham-Net.jpg'];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -12,7 +13,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => Promise.all(
-            keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+            keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key))
         )).then(() => self.clients.claim())
     );
 });
@@ -30,15 +31,23 @@ self.addEventListener('fetch', (event) => {
     if (isArticleRoute) {
         const articleUrl = new URL('./article.html', self.location.href);
         event.respondWith(
-            caches.match(articleUrl)
-                .then((cached) => cached || fetch(articleUrl))
+            fetch(articleUrl, { cache: 'no-cache' })
+                .then((response) => {
+                    if (response && response.status === 200) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(articleUrl, copy));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(articleUrl)
+                    .then((cached) => cached || caches.match('./article.html')))
         );
         return;
     }
 
     if (isNavigationRequest) {
         event.respondWith(
-            fetch(event.request)
+            fetch(event.request, { cache: 'no-cache' })
                 .then((response) => {
                     if (response && response.status === 200) {
                         const copy = response.clone();
