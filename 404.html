@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاري تحميل الموضوع...</title>
+</head>
+<body>
+    <p style="text-align: center; font-family: sans-serif;">جاري تحميل الموضوع...</p>
+    <script>
+        const isArticleRoute = /^\/net\/article\/?$/i.test(window.location.pathname);
+        if (isArticleRoute) {
+            fetch('/net/article.html')
+                .then((response) => {
+                    if (!response.ok) throw new Error('تعذر تحميل صفحة المقال');
+                    return response.text();
+                })
+                .then((html) => {
+                    document.open();
+                    document.write(html.replace('<head>', '<head><base href="/net/">'));
+                    document.close();
+                })
+                .catch(() => {
+                    document.body.innerHTML = '<p style="text-align: center; font-family: sans-serif;">تعذر تحميل الموضوع.</p>';
+                });
+        } else {
+            window.location.replace('/net');
+        }
+    </script>
+</body>
+</html>

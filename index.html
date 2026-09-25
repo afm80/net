@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الفحام نت</title>
+    <meta name="theme-color" content="#123456">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(1).png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script>if (localStorage.getItem('site-theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <script>
+        if (window.location.hostname === 'afminfo.github.io' && /\/index\.html$/i.test(window.location.pathname)) {
+            window.location.replace('/net' + window.location.search + window.location.hash);
+        }
+    </script>
+    <style>
+        * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+        body { margin: 0; background-color: #f4f4f4; }
+        .header { background: linear-gradient(135deg, #050b14 0%, #0b1626 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+        .header-logo { height: 45px; }
+        .header-logo-link { display: flex; align-items: center; }
+        .search-btn { background: transparent; border: 0; padding: 0; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; }
+        .search-btn svg { width: 30px; height: 30px; }
+        .theme-btn { background: transparent; border: 0; padding: 0; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; }
+        .theme-btn svg { width: 25px; height: 25px; }
+        .header-actions { display: flex; align-items: center; gap: 4px; margin-right: auto; }
+        .header-actions .search-btn { margin-right: 0; }
+        .install-btn { display: none; background: #ff9900; color: #123456; border: 0; border-radius: 8px; padding: 8px 12px; font: inherit; font-weight: 700; cursor: pointer; }
+        .install-btn.visible { display: block; }
+        .search-area { display: none; flex: 1; max-width: 420px; }
+        .search-area.open { display: flex; gap: 8px; }
+        .search-area input { flex: 1; min-width: 0; padding: 10px 12px; border: 0; border-radius: 8px; font-family: inherit; }
+        .search-area button { padding: 9px 14px; border: 0; border-radius: 8px; cursor: pointer; color: #123456; font-weight: bold; }
+        .categories-bar { position: sticky; top: 0; z-index: 1000; background-color: #ffffff; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 4px 12px; overflow: visible; white-space: normal; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .category-link { display: inline-flex; align-items: center; color: #123456; text-decoration: none; font-size: 15px; font-weight: 800; transition: color 0.3s; padding: 4px 12px; border-radius: 8px; }
+        .category-link:hover { color: #ff9900; background: transparent; }
+        .main-story { margin: 28px 20px 20px; text-align: center; cursor: pointer; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .main-story img { width: 100%; aspect-ratio: 16 / 9; height: auto; object-fit: cover; display: block; }
+        .main-story .featured-video { width: 100%; height: min(56vw, 520px); min-height: 280px; display: block; border: 0; border-radius: 0; background: #000; }
+        .main-story h2 { background-color: #ffffff; color: #333333; margin: 0; padding: 16px; font-size: 24px; line-height: 1.5; }
+        .category-item { position: relative; z-index: 1001; display: inline-flex; align-items: center; }
+        .category-item.open { z-index: 2000; }
+        .category-toggle { flex: 0 0 28px; width: 28px; height: 28px; margin-right: 2px; border: 0; background: transparent; color: #123456; cursor: pointer; padding: 0; font: inherit; font-size: 25px; font-weight: 900; line-height: 22px; text-align: center; transition: transform 0.2s, color 0.2s; }
+        .category-toggle:hover, .category-item.open > .category-toggle { background: transparent; color: #ff9900; }
+        .category-item.open > .category-toggle { transform: rotate(180deg); }
+        .sub-menu { display: none !important; }
+        .category-toggle { display: none; }
+        .category-item.open .sub-menu { display: block; }
+        .sub-menu .category-item { display: flex; width: 100%; }
+        .sub-menu .category-item > .sub-menu { top: 0; right: 100%; }
+        @media (hover: hover) and (pointer: fine) { .category-item:hover .sub-menu { display: block; } }
+        @media (hover: none), (pointer: coarse) {
+            .category-item.open > .sub-menu { display: block; }
+        }
+        .sub-menu a { display: block; width: 100%; padding: 10px 12px; color: #123456; text-decoration: none; font-weight: 700; white-space: normal; word-break: break-word; }
+        .sub-menu a:hover { background: transparent; }
+        .latest-ticker { position: sticky; top: var(--categories-bar-height, 60px); z-index: 999; display: flex; align-items: center; gap: 12px; overflow: hidden; background: linear-gradient(135deg, #050b14 0%, #0b1626 100%); color: white; height: var(--categories-bar-height, 37px); min-height: var(--categories-bar-height, 37px); padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+        .latest-ticker-label { flex: 0 0 auto; background: #d69a25; color: #050b14; padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+        .latest-ticker-window { flex: 1; overflow: hidden; direction: ltr; }
+        .latest-ticker-track { display: inline-flex; gap: 42px; min-width: max-content; direction: rtl; animation: latestTickerMove 90s linear infinite; }
+        .latest-ticker:hover .latest-ticker-track, .latest-ticker:focus-within .latest-ticker-track { animation-play-state: paused; }
+        .latest-ticker-link { color: white; text-decoration: none; font-size: 14px; font-weight: 700; white-space: nowrap; }
+        .latest-ticker-link::before { content: '•'; color: #d69a25; margin-left: 8px; }
+        @keyframes latestTickerMove { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+        @media (prefers-reduced-motion: reduce) { .latest-ticker-track { animation: none; } }
+        .subcategory-cards { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+        .subcategory-cards.visible { display: grid; }
+        .subcategory-card { display: flex; align-items: center; min-height: 120px; padding: 22px 20px; background: #ffffff; color: #123456; border: 1px solid #dfe6ed; border-right: 5px solid #ff9900; border-radius: 10px; text-decoration: none; font-size: 18px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s, background 0.2s; }
+        .subcategory-card:hover { background: #f7f9fb; transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        .grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 0 20px 30px 20px; max-width: 1200px; margin: 20px auto 0; }
+        .empty-state { grid-column: 1 / -1; margin: 20px 0; padding: 28px 20px; background: white; border: 1px solid #e0e0e0; border-radius: 12px; color: #666; text-align: center; font-weight: 700; }
+        .article-card { height: 200px; min-width: 0; background-color: white; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; text-decoration: none; display: flex; flex-direction: row; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .article-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.09); }
+        .article-card img { flex: 0 0 40%; width: 40%; min-width: 180px; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+        .article-info { min-width: 0; margin: 0; padding: 16px; display: flex; flex: 1 1 auto; flex-direction: column; justify-content: center; align-items: flex-start; overflow: hidden; }
+        .article-info h3 { width: 100%; margin: 0; font-size: 18px; font-weight: 700; color: #333; text-align: right; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+        .article-info p { width: 100%; max-height: 1.6em; margin: 8px 0 0 0; font-size: 14px; color: #666; text-align: right; line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .category-page .grid-container { grid-template-columns: 1fr; }
+        .category-page .grid-container { padding-top: 20px; }
+        .home-page .article-card { height: auto; flex-direction: column; }
+        .home-page .article-card img { flex: 0 0 auto; width: 100%; min-width: 0; height: auto; aspect-ratio: 16 / 9; }
+        .home-page .article-info { flex: 0 0 auto; width: 100%; }
+        .pagination { display: flex; gap: 10px; margin: 20px auto; padding: 0 20px; max-width: 1200px; justify-content: center; align-items: center; }
+        .pagination a { background-color: #f4f4f4; color: #333; border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s; }
+        .pagination a:hover { background-color: #123456; color: white; border-color: #123456; }
+        .pagination a.active { background-color: #123456; color: white; border-color: #123456; }
+        .footer { background-color: #f4f4f4; color: #333; text-align: center; padding: 20px; margin-top: 20px; border-top: 1px solid #e0e0e0; }
+        .dark-mode body { background-color: #050b14; color: #e8edf2; }
+        .dark-mode .categories-bar, .dark-mode .article-card, .dark-mode .subcategory-card, .dark-mode .empty-state, .dark-mode .main-story, .dark-mode .main-story h2, .dark-mode .footer { background-color: #202b36; color: #e8edf2; border-color: #34424f; }
+        .dark-mode .categories-bar { background-color: #ffffff; }
+        .dark-mode .category-link, .dark-mode .article-info h3, .dark-mode .subcategory-card { color: #e8edf2; }
+        .dark-mode .categories-bar .category-link, .dark-mode .categories-bar .category-toggle { color: #000000; }
+        .dark-mode .categories-bar .category-link:hover { color: #d69a25 !important; }
+        .dark-mode .category-toggle { color: #d69a25; }
+        .dark-mode .category-link:hover { background: transparent; }
+        .dark-mode .subcategory-card:hover { background: #2b3742; }
+        .dark-mode .sub-menu { background: #202b36; border-color: #34424f; }
+        .dark-mode .sub-menu a { color: #e8edf2; }
+        .dark-mode .sub-menu a:hover { background: transparent; }
+        .dark-mode .article-info p { color: #b9c4cf; }
+        .dark-mode .empty-state, .dark-mode .pagination a { color: #e8edf2; }
+        .dark-mode .pagination a { background-color: #111e2d; border-color: #29405a; }
+        .dark-mode .pagination a.active { background-color: #ff9900; color: #123456; border-color: #ff9900; }
+        .dark-mode .search-area input { background: #111e2d; color: #fff; }
+        .dark-mode .latest-ticker { background: #d69a25; }
+        .dark-mode .latest-ticker-label { background: #050b14; color: #ffffff; }
+        .dark-mode .latest-ticker-link { color: #000000; }
+        .dark-mode .latest-ticker-link::before { color: #000000; }
+        @media (max-width: 768px) {
+            .header { width: 100%; max-width: 100%; flex-wrap: wrap; padding: 12px 16px; }
+            .header > * { min-width: 0; }
+            .header-logo { height: 40px; }
+            .search-btn { margin-right: auto; }
+            .search-area.open { order: 3; flex-basis: 100%; max-width: none; }
+            .categories-bar { position: sticky; top: 0; min-height: 42px; padding: 4px 12px; gap: 4px 8px; flex-wrap: nowrap; white-space: nowrap; overflow-x: auto; overflow-y: visible; -webkit-overflow-scrolling: touch; scrollbar-width: thin; z-index: 1100; }
+            .category-item { flex: 0 0 auto; z-index: 1200; }
+            .category-link { font-size: 14px; padding: 6px 9px; white-space: nowrap; }
+            .sub-menu { position: fixed; top: var(--category-menu-top, 48px); right: 10px; left: 10px; min-width: 0; max-height: 60vh; overflow-y: auto; z-index: 5000; }
+            .latest-ticker { width: 100%; max-width: 100%; padding: 0 12px; gap: 8px; }
+            .latest-ticker-label { padding: 5px 8px; font-size: 12px; }
+            .latest-ticker-link { font-size: 13px; }
+            .main-story { width: calc(100% - 24px); max-width: 100%; margin: 18px 12px 16px; }
+            .main-story .featured-video { min-height: 210px; height: 56vw; }
+            .main-story h2 { font-size: 20px; padding: 13px 12px; }
+            .grid-container { width: 100%; max-width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 12px 24px; margin-top: 14px; }
+            .article-card { width: 100%; min-width: 0; height: 170px; }
+            .article-card img { width: 35%; min-width: 120px; height: 100%; }
+            .article-info { padding: 12px; }
+            .article-info h3 { font-size: 16px; }
+            .article-info p { font-size: 13px; }
+            .subcategory-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 14px auto; padding: 0 12px; }
+            .subcategory-card { min-height: 88px; padding: 16px 12px; font-size: 14px; }
+            .pagination { gap: 6px; padding: 0 12px; }
+            .pagination a { padding: 8px 13px; font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .header { gap: 8px; }
+            .header-logo { max-width: 150px; height: auto; }
+            .search-btn { width: 38px; height: 38px; }
+            .search-btn svg { width: 27px; height: 27px; }
+            .categories-bar { min-height: 42px; }
+            .categories-bar::-webkit-scrollbar { height: 5px; }
+            .categories-bar::-webkit-scrollbar-thumb { background: #b7c1cc; border-radius: 10px; }
+            .category-item { flex: 0 0 auto; }
+            .category-link { font-size: 13px; padding: 6px 7px; }
+            .grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .article-card img { width: 34%; min-width: 105px; height: 100%; }
+            .article-card { width: 100%; min-width: 0; height: 140px; }
+            .article-info { padding: 10px; }
+            .article-info h3 { font-size: 15px; line-height: 1.45; }
+            .article-info p { display: none; }
+            .subcategory-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a class="header-logo-link" href="https://afminfo.github.io/net" aria-label="الرئيسية">
+            <img class="header-logo" src="https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(2).png" alt="شعار الموقع">
+        </a>
+        <form class="search-area" id="search-area">
+            <input id="search-input" type="search" placeholder="ابحث في المواضيع" aria-label="البحث">
+            <button type="submit">بحث</button>
+        </form>
+        <div class="header-actions">
+        <button class="theme-btn" id="theme-btn" type="button" title="الوضع الداكن" aria-label="تفعيل الوضع الداكن">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg>
+        </button>
+        <button class="search-btn" title="بحث">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </button>
+        </div>
+        <button class="install-btn" id="install-btn" type="button">تثبيت التطبيق</button>
+    </div>
+    <div class="categories-bar" id="categories-bar"></div>
+    <div class="latest-ticker" id="latest-ticker" aria-label="آخر المواضيع" hidden>
+        <span class="latest-ticker-label">آخر المواضيع</span>
+        <div class="latest-ticker-window"><div class="latest-ticker-track" id="latest-ticker-track"></div></div>
+    </div>
+    <div class="main-story" id="main-story" style="display: none;"></div>
+    <div class="subcategory-cards" id="subcategory-cards"></div>
+    <div class="grid-container" id="articles-grid"></div>
+    <div class="pagination" id="pagination"></div>
+    <div class="footer">جميع الحقوق محفوظة © 2026</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdpCRwQ14IdBa-gFV-Hh5d2gj_oDzdGp0",
+            authDomain: "iraq-net-1980.firebaseapp.com",
+            databaseURL: "https://iraq-net-1980-default-rtdb.firebaseio.com",
+            projectId: "iraq-net-1980",
+            storageBucket: "iraq-net-1980.firebasestorage.app",
+            messagingSenderId: "901603428041",
+            appId: "1:901603428041:web:78a9894df84ed9c09aaf18",
+            measurementId: "G-BESTP0T6PC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const fallbackImage = 'https://raw.githubusercontent.com/h-80/img/refs/heads/main/Alfaham%20net%20(3).png';
+        let allArticles = [];
+        let allCategories = [];
+        let featuredVideo = null;
+        let deferredInstallPrompt = null;
+
+        function setupInstallPrompt() {
+            const installButton = document.getElementById('install-btn');
+            if (!installButton) return;
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault();
+                deferredInstallPrompt = event;
+                installButton.classList.add('visible');
+            });
+            installButton.addEventListener('click', async () => {
+                if (!deferredInstallPrompt) return;
+                deferredInstallPrompt.prompt();
+                await deferredInstallPrompt.userChoice;
+                deferredInstallPrompt = null;
+                installButton.classList.remove('visible');
+            });
+            window.addEventListener('appinstalled', () => installButton.classList.remove('visible'));
+        }
+
+        function setupThemeToggle() {
+            const button = document.getElementById('theme-btn');
+            if (!button) return;
+            const updateThemeButton = () => {
+                const dark = document.documentElement.classList.contains('dark-mode');
+                button.title = dark ? 'التحويل إلى الوضع الفاتح' : 'التحويل إلى الوضع الداكن';
+                button.setAttribute('aria-label', dark ? 'التحويل إلى الوضع الفاتح' : 'التحويل إلى الوضع الداكن');
+                button.innerHTML = dark
+                    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>'
+                    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg>';
+            };
+            button.addEventListener('click', () => {
+                const dark = document.documentElement.classList.toggle('dark-mode');
+                localStorage.setItem('site-theme', dark ? 'dark' : 'light');
+                updateThemeButton();
+            });
+            updateThemeButton();
+        }
+
+        function normalizeArticles(snapshot) {
+            if (!snapshot || !snapshot.exists()) return [];
+            const data = snapshot.val() || {};
+            return Object.entries(data)
+                .map(([id, value]) => ({ id, ...(value || {}) }))
+                .sort(sortByNewest);
+        }
+
+        function sortByNewest(first, second) {
+            return Number(second.createdAt || 0) - Number(first.createdAt || 0);
+        }
+
+        function isPinned(article) {
+            return article.pinned === true || article.pinned === 'true' || article.pinned === 1;
+        }
+
+        function isPinnedVideo(article) {
+            return article.videoPinned === true || article.videoPinned === 'true' || article.videoPinned === 1;
+        }
+
+        function getYoutubeVideoId(url) {
+            if (!url) return '';
+            try {
+                const parsedUrl = new URL(String(url).trim());
+                const hostname = parsedUrl.hostname.toLowerCase();
+                if (hostname === 'youtu.be') return parsedUrl.pathname.slice(1).split('/')[0];
+                if (!hostname.includes('youtube.com')) return '';
+                if (parsedUrl.pathname === '/watch') return parsedUrl.searchParams.get('v') || '';
+                const pathParts = parsedUrl.pathname.split('/').filter(Boolean);
+                if (['shorts', 'live', 'embed'].includes(pathParts[0])) return pathParts[1] || '';
+            } catch (error) {
+                return '';
+            }
+            return '';
+        }
+
+        function getArticleImage(article) {
+            const directImage = String(article.imageUrl || '').trim();
+            if (directImage) return directImage;
+
+            const videoUrls = Array.isArray(article.videoUrls) && article.videoUrls.length
+                ? article.videoUrls
+                : (article.videoUrl ? [article.videoUrl] : []);
+            const youtubeId = videoUrls.map(getYoutubeVideoId).find(Boolean);
+            if (youtubeId) return `https://img.youtube.com/vi/${encodeURIComponent(youtubeId)}/hqdefault.jpg`;
+
+            return fallbackImage;
+        }
+
+        function getArticleImageHtml(article, title) {
+            const image = getArticleImage(article);
+            return `<img src="${image}" alt="${title}" onerror="this.onerror=null;this.src='${fallbackImage}';">`;
+        }
+
+        function escapeHtml(value) {
+            return String(value || '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+        }
+
+        function getArticlePreview(content, maxLength = 110) {
+            const previewElement = document.createElement('div');
+            previewElement.innerHTML = String(content || '');
+            const text = (previewElement.textContent || previewElement.innerText || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text;
+        }
+
+        function renderLatestTicker(articles) {
+            const latest = articles.slice(0, 10);
+            const links = latest.length
+                ? latest.map((article) => `<a class="latest-ticker-link" href="${escapeHtml(getArticleHref(article))}">${escapeHtml(article.title || 'موضوع جديد')}</a>`).join('')
+                : '<span class="latest-ticker-link">لا توجد مواضيع منشورة حاليًا</span>';
+            document.querySelectorAll('.latest-ticker').forEach((ticker) => {
+                const track = ticker.querySelector('.latest-ticker-track');
+                if (!track) return;
+                track.innerHTML = links + links;
+                ticker.hidden = false;
+            });
+        }
+
+        function getArticleVideoUrls(article) {
+            return Array.isArray(article.videoUrls) && article.videoUrls.length
+                ? article.videoUrls.filter(Boolean)
+                : (article.videoUrl ? [article.videoUrl] : []);
+        }
+
+        function getYoutubeEmbedUrl(url) {
+            const videoId = getYoutubeVideoId(url);
+            return videoId ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?rel=0&playsinline=1` : '';
+        }
+
+        function isHlsUrl(url) {
+            return /\.m3u8(?:$|[?#])/i.test(url || '')
+                || /(?:format|type|protocol|stream)=?(?:hls|m3u8|application\/x-mpegurl)/i.test(url || '')
+                || /(?:\/|\b)(?:hls|playlist|manifest|live\.m3u8)(?:\/|\b)/i.test(url || '');
+        }
+
+        function isDashUrl(url) {
+            return /\.mpd(?:$|[?#])/i.test(url || '')
+                || /(?:format|type|protocol|stream)=?(?:dash|mpd|application\/dash\+xml)/i.test(url || '');
+        }
+
+        function isFlvUrl(url) {
+            return /\.(?:flv|ts)(?:$|[?#])/i.test(url || '')
+                || /(?:format|type)=?(?:flv|mpegts|video\/mp2t)/i.test(url || '');
+        }
+
+        function loadExternalPlayer(src, globalName) {
+            if (window[globalName]) return Promise.resolve(window[globalName]);
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => resolve(window[globalName]);
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        function loadMpegtsLibrary() {
+            return loadExternalPlayer('https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js', 'mpegts');
+        }
+
+        function setupFeaturedStream(video, url) {
+            if (!video) return;
+            if (isHlsUrl(url)) {
+                if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    return;
+                }
+                loadExternalPlayer('https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js', 'Hls')
+                    .then((Hls) => {
+                        if (!Hls || !Hls.isSupported()) throw new Error('HLS غير مدعوم');
+                        const player = new Hls();
+                        player.loadSource(url);
+                        player.attachMedia(video);
+                    })
+                    .catch(() => { video.poster = fallbackImage; });
+            } else if (isDashUrl(url)) {
+                loadExternalPlayer('https://cdn.dashjs.org/latest/dash.all.min.js', 'dashjs')
+                    .then((dashjs) => {
+                        if (!dashjs || !dashjs.MediaPlayer) throw new Error('DASH غير مدعوم');
+                        dashjs.MediaPlayer().create().initialize(video, url, false);
+                    })
+                    .catch(() => { video.poster = fallbackImage; });
+            } else if (isFlvUrl(url)) {
+                loadMpegtsLibrary()
+                    .then((mpegts) => {
+                        if (!mpegts || !mpegts.isSupported()) throw new Error('FLV غير مدعوم');
+                        const player = mpegts.createPlayer({ type: 'flv', url });
+                        player.attachMediaElement(video);
+                        player.load();
+                        player.play().catch(() => {});
+                    })
+                    .catch(() => { video.poster = fallbackImage; });
+            } else {
+                video.src = url;
+                video.addEventListener('error', () => {
+                    if (video.dataset.streamFallback) return;
+                    video.dataset.streamFallback = 'true';
+                    loadExternalPlayer('https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js', 'Hls')
+                        .then((Hls) => {
+                            if (!Hls || !Hls.isSupported()) throw new Error('البث غير مدعوم');
+                            const player = new Hls();
+                            player.loadSource(url);
+                            player.attachMedia(video);
+                        })
+                        .catch(() => { video.poster = fallbackImage; });
+                }, { once: true });
+            }
+        }
+
+        function getFeaturedVideoHtml(article) {
+            const videoUrl = getArticleVideoUrls(article)[0];
+            if (!videoUrl) return '';
+            const youtubeUrl = getYoutubeEmbedUrl(videoUrl);
+            if (youtubeUrl) {
+                return `<iframe class="featured-video" src="${youtubeUrl}&autoplay=1&mute=1" title="الفيديو المثبت" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="origin" allowfullscreen></iframe>`;
+            }
+            return `<video id="featured-video-player" class="featured-video" controls autoplay muted playsinline></video>`;
+        }
+
+        function getFeaturedVideoData() {
+            if (!featuredVideo || featuredVideo.enabled !== true && featuredVideo.enabled !== 'true') return null;
+            const url = String(featuredVideo.url || '').trim();
+            if (!url) return null;
+            return { title: 'الفيديو المثبت', videoUrl: url };
+        }
+
+        function getArticleHref(article) {
+            const customUrl = String(article.url || article.link || '').trim();
+            if (customUrl) {
+                try {
+                    const parsedUrl = new URL(customUrl, window.location.href);
+                    if (/\/article(?:\.html)?$/i.test(parsedUrl.pathname)) {
+                        const articleKey = parsedUrl.searchParams.get('id') || article.id;
+                        return `https://afminfo.github.io/net/article?id=${encodeURIComponent(articleKey)}`;
+                    }
+                } catch (error) {
+                    return customUrl;
+                }
+                return customUrl;
+            }
+            return customUrl || `https://afminfo.github.io/net/article?id=${encodeURIComponent(article.id)}`;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedCategory = urlParams.get('category') || 'home';
+        const searchTerm = urlParams.get('q') || '';
+        const currentPage = Math.max(1, Number.parseInt(urlParams.get('page') || '1', 10) || 1);
+        const articlesPerPage = 12;
+        document.body.classList.add(selectedCategory === 'home' && !searchTerm ? 'home-page' : 'category-page');
+
+        function buildCategoryTree(categories) {
+            const entries = Object.entries(categories || {});
+            const map = new Map(entries);
+            const childMap = new Map();
+            entries.forEach(([id, value]) => {
+                const parentId = value?.parentId || null;
+                if (!childMap.has(parentId)) childMap.set(parentId, []);
+                if (parentId) childMap.get(parentId).push(id);
+            });
+            const makeItem = (id, seen = new Set()) => {
+                if (seen.has(id) || !map.has(id)) return null;
+                const value = map.get(id) || {};
+                const item = {
+                    id,
+                    name: value.name || value.nam || value.title || value.label || 'قسم',
+                    parentId: value.parentId || null,
+                    url: value.url || '',
+                    children: []
+                };
+                const nextSeen = new Set(seen);
+                nextSeen.add(id);
+                const childIds = childMap.get(id) || [];
+                childIds.forEach((childId) => {
+                    const child = makeItem(childId, nextSeen);
+                    if (child) item.children.push(child);
+                });
+                return item;
+            };
+            const roots = [];
+            const rootIds = entries
+                .filter(([id, value]) => !value?.parentId || !map.has(value.parentId))
+                .map(([id]) => id);
+            rootIds.forEach((id) => {
+                const root = makeItem(id);
+                if (root) roots.push(root);
+            });
+            return roots;
+        }
+
+        function getCategoryFilters(categoryId) {
+            if (!categoryId || categoryId === 'home') return null;
+            const ids = new Set([categoryId]);
+            const queue = [categoryId];
+            while (queue.length) {
+                const currentId = queue.shift();
+                const children = allCategories.filter((category) => category.parentId === currentId);
+                children.forEach((child) => {
+                    if (!ids.has(child.id)) {
+                        ids.add(child.id);
+                        queue.push(child.id);
+                    }
+                });
+            }
+            return ids;
+        }
+
+        function loadCategories() {
+            return get(ref(db, 'categories'))
+                .then((snapshot) => {
+                    const categories = snapshot.exists() ? snapshot.val() : {};
+                    allCategories = Object.entries(categories).map(([id, value]) => ({
+                        id,
+                        name: value?.name || value?.nam || value?.title || value?.label || 'قسم',
+                        url: value?.url || '',
+                        parentId: value?.parentId || null,
+                        children: []
+                    }));
+                    const bar = document.getElementById('categories-bar');
+                    syncStickyBarHeight();
+                    const roots = buildCategoryTree(categories);
+                    bar.innerHTML = '<a href="https://afminfo.github.io/net" class="category-link" data-id="home">الرئيسية</a>';
+                    const renderCategory = (category) => {
+                        const children = category.children || [];
+                        const categoryHref = category.url || `https://afminfo.github.io/net?category=${encodeURIComponent(category.id)}`;
+                        const submenu = children.length
+                            ? `<div class="sub-menu">${children.map(renderCategory).join('')}</div>`
+                            : '';
+                        return `<div class="category-item">
+                            <a href="${categoryHref}" class="category-link${children.length ? ' category-parent-link' : ''}" data-id="${category.id}">${category.name}</a>
+                            ${children.length ? `<button type="button" class="category-toggle" title="فتح الأقسام الفرعية" aria-label="فتح الأقسام الفرعية لقسم ${category.name}" aria-expanded="false">⌄</button>` : ''}
+                            ${submenu}
+                        </div>`;
+                    };
+                    bar.insertAdjacentHTML('beforeend', roots.map(renderCategory).join(''));
+                    const toggleCategoryItem = (item) => {
+                        const submenu = item.querySelector(':scope > .sub-menu');
+                        const toggle = item.querySelector(':scope > .category-toggle');
+                        if (!submenu) return;
+                        if (window.innerWidth <= 768) {
+                            const barBottom = bar.getBoundingClientRect().bottom;
+                            document.documentElement.style.setProperty('--category-menu-top', `${Math.max(4, barBottom + 4)}px`);
+                        }
+                        const isOpen = item.classList.toggle('open');
+                        if (toggle) toggle.setAttribute('aria-expanded', String(isOpen));
+                    };
+
+                    const toggleButtons = bar.querySelectorAll('.category-item > .category-toggle');
+                    toggleButtons.forEach((toggle) => {
+                        toggle.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const parentItem = toggle.closest('.category-item');
+                            toggleCategoryItem(parentItem);
+                        });
+                    });
+                })
+                .catch(() => {
+                    document.getElementById('categories-bar').innerHTML = '<a href="https://afminfo.github.io/net" class="category-link" data-id="home">الرئيسية</a>';
+                    syncStickyBarHeight();
+                });
+        }
+
+        function syncStickyBarHeight() {
+            const categoriesBar = document.getElementById('categories-bar');
+            if (categoriesBar) document.documentElement.style.setProperty('--categories-bar-height', `${categoriesBar.offsetHeight}px`);
+        }
+
+        document.addEventListener('click', (event) => {
+            document.querySelectorAll('.category-item.open').forEach((item) => {
+                if (item.contains(event.target)) return;
+                item.classList.remove('open');
+                const toggle = item.querySelector(':scope > .category-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        function loadArticles() {
+            Promise.all([get(ref(db, 'articles')), get(ref(db, 'featuredVideo'))])
+                .then(([snapshot, featuredSnapshot]) => {
+                    featuredVideo = featuredSnapshot.exists() ? featuredSnapshot.val() || null : null;
+                    allArticles = normalizeArticles(snapshot);
+                    renderLatestTicker(allArticles);
+                    const filtered = allArticles.filter((article) => {
+                        const searchableText = `${article.title || ''} ${article.content || ''}`.toLowerCase();
+                        const matchesCategory = selectedCategory === 'home'
+                            || article.categoryId === selectedCategory;
+                        const matchesSearch = !searchTerm || searchableText.includes(searchTerm.toLowerCase());
+                        return matchesCategory && matchesSearch;
+                    }).sort((first, second) => {
+                        if (selectedCategory === 'home' && isPinnedVideo(first) !== isPinnedVideo(second)) {
+                            return isPinnedVideo(first) ? -1 : 1;
+                        }
+                        if (selectedCategory === 'home' && isPinned(first) !== isPinned(second)) {
+                            return isPinned(first) ? -1 : 1;
+                        }
+                        return sortByNewest(first, second);
+                    });
+                    displayArticles(filtered);
+                })
+                .catch(() => {
+                    renderLatestTicker([]);
+                    displayArticles([]);
+                });
+        }
+
+        const searchArea = document.getElementById('search-area');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.querySelector('.search-btn');
+        if (searchButton && searchArea && searchInput) {
+            searchButton.addEventListener('click', () => {
+                searchArea.classList.toggle('open');
+                if (searchArea.classList.contains('open')) searchInput.focus();
+            });
+            searchInput.value = searchTerm;
+            searchArea.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const query = searchInput.value.trim();
+                const params = new URLSearchParams();
+                if (selectedCategory !== 'home') params.set('category', selectedCategory);
+                if (query) params.set('q', query);
+                window.location.href = `https://afminfo.github.io/net${params.toString() ? '?' + params.toString() : ''}`;
+            });
+        }
+
+        function displayArticles(articles) {
+            const grid = document.getElementById('articles-grid');
+            const mainStory = document.getElementById('main-story');
+            const subcategoryCards = document.getElementById('subcategory-cards');
+            const pagination = document.getElementById('pagination');
+            grid.innerHTML = '';
+            subcategoryCards.innerHTML = '';
+            subcategoryCards.classList.remove('visible');
+            pagination.innerHTML = '';
+
+            if (selectedCategory !== 'home') {
+                const childCategories = allCategories
+                    .filter((category) => category.parentId === selectedCategory)
+                    .sort((first, second) => first.name.localeCompare(second.name, 'ar'));
+                if (childCategories.length) {
+                    subcategoryCards.innerHTML = childCategories.map((category) => {
+                        const targetHref = category.url || `https://afminfo.github.io/net?category=${encodeURIComponent(category.id)}`;
+                        return `
+                            <a class="subcategory-card" href="${targetHref}">
+                                ${category.name}
+                            </a>`;
+                    }).join('');
+                    subcategoryCards.classList.add('visible');
+                }
+            }
+
+            if (!articles || articles.length === 0) {
+                mainStory.style.display = 'none';
+                mainStory.innerHTML = '';
+                grid.innerHTML = `<p class="empty-state">${selectedCategory === 'home' ? 'لا توجد مواضيع منشورة حاليًا.' : 'لا توجد مواضيع في هذا القسم حاليًا.'}</p>`;
+                return;
+            }
+
+            const isHomepage = selectedCategory === 'home' && !searchTerm;
+            const hasSeparateFeaturedVideo = isHomepage && Boolean(getFeaturedVideoData());
+            const homepageFeaturedArticleCount = isHomepage && !hasSeparateFeaturedVideo ? 1 : 0;
+            const homepageFirstPageSize = articlesPerPage + homepageFeaturedArticleCount;
+            const totalPages = isHomepage
+                ? (articles.length <= homepageFirstPageSize
+                    ? 1
+                    : 1 + Math.ceil((articles.length - homepageFirstPageSize) / articlesPerPage))
+                : Math.ceil(articles.length / articlesPerPage);
+            const page = Math.min(currentPage, totalPages);
+            const pageStart = isHomepage && page > 1
+                ? homepageFirstPageSize + ((page - 2) * articlesPerPage)
+                : (isHomepage ? 0 : (page - 1) * articlesPerPage);
+            const pageSize = isHomepage && page === 1 ? homepageFirstPageSize : articlesPerPage;
+            const pageArticles = articles.slice(pageStart, pageStart + pageSize);
+            const showMainStory = isHomepage && page === 1;
+            const cards = showMainStory
+                ? (hasSeparateFeaturedVideo ? pageArticles : pageArticles.slice(1))
+                : pageArticles;
+
+            if (showMainStory) {
+                const first = pageArticles[0];
+                const separateFeaturedVideo = getFeaturedVideoData();
+                const featuredArticle = separateFeaturedVideo ? { videoUrl: separateFeaturedVideo.videoUrl } : first;
+                const mainTitle = separateFeaturedVideo ? separateFeaturedVideo.title : (first.title || 'عنوان غير متاح');
+                const mainImageHtml = getArticleImageHtml(first, mainTitle);
+                const featuredVideoHtml = separateFeaturedVideo
+                    ? getFeaturedVideoHtml(featuredArticle)
+                    : (isPinnedVideo(first) ? getFeaturedVideoHtml(first) : '');
+                const mainLink = separateFeaturedVideo ? '' : getArticleHref(first);
+
+                mainStory.style.display = 'block';
+                mainStory.innerHTML = `
+                    ${featuredVideoHtml || `<a href="${mainLink}" style="text-decoration: none; color: inherit;">${mainImageHtml}</a>`}
+                    ${mainLink ? `<a href="${mainLink}" style="text-decoration: none; color: inherit;"><h2>${mainTitle}</h2></a>` : ''}`;
+                const featuredUrl = getArticleVideoUrls(featuredArticle)[0];
+                if (featuredVideoHtml && !getYoutubeEmbedUrl(featuredUrl)) {
+                    setupFeaturedStream(document.getElementById('featured-video-player'), featuredUrl);
+                }
+            } else {
+                mainStory.style.display = 'none';
+                mainStory.innerHTML = '';
+            }
+
+            cards.forEach((article) => {
+                const title = article.title || 'عنوان غير متاح';
+                const contentPreview = getArticlePreview(article.content);
+                const imageHtml = getArticleImageHtml(article, title);
+                const articleHref = getArticleHref(article);
+
+                grid.innerHTML += `
+                    <a href="${articleHref}" class="article-card">
+                        ${imageHtml}
+                        <div class="article-info">
+                            <h3>${escapeHtml(title)}</h3>
+                            <p>${escapeHtml(contentPreview)}</p>
+                        </div>
+                    </a>`;
+            });
+
+            if (totalPages > 1) {
+                for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                    const params = new URLSearchParams();
+                    if (selectedCategory !== 'home') params.set('category', selectedCategory);
+                    if (searchTerm) params.set('q', searchTerm);
+                    if (pageNumber > 1) params.set('page', pageNumber);
+                    const activeClass = pageNumber === page ? ' active' : '';
+                    pagination.innerHTML += `<a href="https://afminfo.github.io/net?${params.toString()}" class="${activeClass.trim()}" aria-label="الصفحة ${pageNumber}">${pageNumber}</a>`;
+                }
+            }
+        }
+
+        loadCategories().then(loadArticles);
+        if ('ResizeObserver' in window) new ResizeObserver(syncStickyBarHeight).observe(document.getElementById('categories-bar'));
+        window.addEventListener('resize', syncStickyBarHeight);
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=28').catch(() => {});
+        setupInstallPrompt();
+        setupThemeToggle();
+    </script>
+</body>
+</html>
